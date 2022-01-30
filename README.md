@@ -1,5 +1,7 @@
 # WireMock support for Micronaut Applications
 
+[![Maven Central](https://img.shields.io/maven-central/v/com.rapatao.micronaut/micronaut-wiremock.svg?label=Maven%20Central)](https://search.maven.org/artifact/com.rapatao.micronaut/micronaut-wiremock)
+
 The `micronaut-wiremock` makes simple the use of [WireMock](https://github.com/wiremock/wiremock) for testing a
 Micronaut application.
 
