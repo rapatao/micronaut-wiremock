@@ -1,0 +1,139 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlinx:kover:0.4.2"
+    }
+}
+
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.6.10"
+    id "org.jetbrains.kotlin.kapt" version "1.6.10"
+    id "org.jetbrains.kotlin.plugin.allopen" version "1.6.10"
+    id "io.micronaut.library" version "3.2.0"
+    id "io.gitlab.arturbosch.detekt" version "1.18.1"
+    id "org.jetbrains.kotlinx.kover" version "0.4.2"
+    id "signing"
+    id 'maven-publish'
+}
+
+group = 'com.rapatao.micronaut'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+micronaut {
+    version = "3.3.0"
+    testRuntime("junit5")
+    processing {
+        incremental true
+        annotations "com.rapatao.micronaut.wiremock.*"
+    }
+}
+
+dependencies {
+    implementation "com.github.tomakehurst:wiremock-jre8:2.32.0"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.10"
+
+    testImplementation("io.micronaut:micronaut-http-client")
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+kover {
+    enabled = true
+    coverageEngine.set(kotlinx.kover.api.CoverageEngine.JACOCO)
+    jacocoEngineVersion.set("0.8.7")
+    generateReportOnCheck.set(true)
+}
+
+tasks.koverVerify {
+    rule {
+        name = "Minimal line coverage rate in percents"
+        bound {
+            minValue = 90
+        }
+    }
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        txt.enabled = true
+        sarif.enabled = true
+    }
+}
+
+signing {
+    sign configurations.archives
+    sign publishing.publications
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+
+            pom {
+                name = "Micronaut WireMock Support"
+                description = "WireMock integration for Micronaut"
+                url = "https://github.com/rapatao/micronaut-wiremock"
+                packaging = "jar"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "rapatao"
+                        name = "Luiz Henrique Rapatao"
+                        email = "rapatao@rapatao.com"
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/rapatao/micronaut-wiremock.git"
+                    developerConnection = "scm:git:ssh://github.com/rapatao/micronaut-wiremock.git"
+                    url = "https://github.com/rapatao/micronaut-wiremock"
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = uri("${buildDir}/publishing-repository")
+        }
+        maven {
+            def releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            def snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+        }
+    }
+
+}

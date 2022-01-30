@@ -1,0 +1,9 @@
+wiremock:
+  enabled: true
+
+
+micronaut:
+  http:
+    services:
+      test:
+        url: http://localhost:9090

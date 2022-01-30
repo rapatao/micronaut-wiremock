@@ -1,0 +1,3 @@
+wiremock:
+  enabled: true
+  port: 9999
