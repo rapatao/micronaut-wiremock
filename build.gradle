@@ -3,30 +3,31 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "org.jetbrains.kotlinx:kover:0.4.2"
+        classpath "org.jetbrains.kotlinx:kover:0.6.0"
     }
 }
 
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.6.10"
-    id "org.jetbrains.kotlin.kapt" version "1.6.10"
-    id "org.jetbrains.kotlin.plugin.allopen" version "1.6.10"
-    id "io.micronaut.library" version "3.2.0"
-    id "io.gitlab.arturbosch.detekt" version "1.18.1"
-    id "org.jetbrains.kotlinx.kover" version "0.4.2"
+    id "org.jetbrains.kotlin.jvm" version "1.7.10"
+    id "org.jetbrains.kotlin.kapt" version "1.7.10"
+    id "org.jetbrains.kotlin.plugin.allopen" version "1.7.10"
+    id "io.micronaut.library" version "3.5.3"
+    id "io.gitlab.arturbosch.detekt" version "1.21.0"
+    id "org.jetbrains.kotlinx.kover" version "0.6.0"
     id "signing"
     id 'maven-publish'
+    id "org.jetbrains.dokka" version "1.7.10"
 }
 
 group = 'com.rapatao.micronaut'
-version = '1.0.1-SNAPSHOT'
+version = '1.0.2-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 micronaut {
-    version = "3.3.0"
+    version = "3.6.2"
     testRuntime("junit5")
     processing {
         incremental true
@@ -35,10 +36,10 @@ micronaut {
 }
 
 dependencies {
-    implementation "com.github.tomakehurst:wiremock-jre8:2.32.0"
+    implementation 'com.github.tomakehurst:wiremock-jre8:2.33.2'
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.10"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.7.10'
 
     testImplementation("io.micronaut:micronaut-http-client")
 }
@@ -57,17 +58,22 @@ compileTestKotlin {
 }
 
 kover {
-    enabled = true
-    coverageEngine.set(kotlinx.kover.api.CoverageEngine.JACOCO)
-    jacocoEngineVersion.set("0.8.7")
-    generateReportOnCheck.set(true)
-}
+//    engine = kotlinx.kover.api.DefaultIntellijEngine.INSTANCE
 
-tasks.koverVerify {
-    rule {
-        name = "Minimal line coverage rate in percents"
-        bound {
-            minValue = 90
+    xmlReport {
+        onCheck.set(true)
+    }
+
+    htmlReport {
+        onCheck.set(true) // true to run koverHtmlReport task during the execution of the check task (if it exists) of the current project
+    }
+
+    verify {
+        rule {
+            name = "Minimal line coverage rate in percents"
+            bound {
+                minValue = 90
+            }
         }
     }
 }
