@@ -1,0 +1,10 @@
+wiremock:
+  enabled: true
+  port: ${random.port}
+
+
+micronaut:
+  http:
+    services:
+      test:
+        url: http://localhost:${wiremock.port}
