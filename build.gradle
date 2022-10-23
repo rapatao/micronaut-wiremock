@@ -1,22 +1,13 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlinx:kover:0.6.0"
-    }
-}
-
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.7.10"
-    id "org.jetbrains.kotlin.kapt" version "1.7.10"
-    id "org.jetbrains.kotlin.plugin.allopen" version "1.7.10"
-    id "io.micronaut.library" version "3.5.3"
-    id "io.gitlab.arturbosch.detekt" version "1.21.0"
-    id "org.jetbrains.kotlinx.kover" version "0.6.0"
+    id "io.gitlab.arturbosch.detekt" version "${detektPluginVersion}"
+    id "io.micronaut.minimal.library" version "${micronautPluginVersion}"
+    id "org.jetbrains.dokka" version "${kotlinVersion}"
+    id "org.jetbrains.kotlin.jvm" version "${kotlinVersion}"
+    id "org.jetbrains.kotlin.kapt" version "${kotlinVersion}"
+    id "org.jetbrains.kotlin.plugin.allopen" version "${kotlinVersion}"
+    id "org.jetbrains.kotlinx.kover" version "${koverPluginVersion}"
     id "signing"
     id 'maven-publish'
-    id "org.jetbrains.dokka" version "1.7.10"
 }
 
 group = 'com.rapatao.micronaut'
@@ -27,8 +18,8 @@ repositories {
 }
 
 micronaut {
-    version = "3.6.2"
-    testRuntime("junit5")
+    version "3.7.1"
+    testRuntime "junit5"
     processing {
         incremental true
         annotations "com.rapatao.micronaut.wiremock.*"
@@ -36,10 +27,12 @@ micronaut {
 }
 
 dependencies {
-    implementation 'com.github.tomakehurst:wiremock-jre8:2.33.2'
+    implementation("com.github.tomakehurst:wiremock-jre8:${wiremockVersion}")
 
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10'
-    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.7.10'
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+
+    compileOnly("org.junit.jupiter:junit-jupiter-api")
 
     testImplementation("io.micronaut:micronaut-http-client")
 }
@@ -50,22 +43,20 @@ java {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions.jvmTarget = "${javaVersion}"
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    kotlinOptions.jvmTarget = "${javaVersion}"
 }
 
 kover {
-//    engine = kotlinx.kover.api.DefaultIntellijEngine.INSTANCE
-
     xmlReport {
-        onCheck.set(true)
+        onCheck = true
     }
 
     htmlReport {
-        onCheck.set(true) // true to run koverHtmlReport task during the execution of the check task (if it exists) of the current project
+        onCheck = true
     }
 
     verify {
@@ -108,7 +99,7 @@ publishing {
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
-                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
                     }
                 }
                 developers {
@@ -141,5 +132,4 @@ publishing {
             }
         }
     }
-
 }
