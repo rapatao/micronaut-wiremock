@@ -93,3 +93,44 @@ internal class Stub2Test {
     }
 }
 ```
+
+## JUnit extension
+
+It is possible to move the stub creation from the testing block by using the `JUnit 5` and the
+annotation `@com.rapatao.micronaut.wiremock.junit.StubFor`.
+
+This annotation extends the JUnit, invoking a class to run the stub definition.
+
+The `@com.rapatao.micronaut.wiremock.junit.StubFor` has an argument that must be used to define
+all `com.rapatao.micronaut.wiremock.junit.StubDefinition` that must be configured
+before the test execution. It accepts a list, that are invoked in the declared order.
+
+### Example of stub definition class
+
+```kotlin
+class ExampleStubDefinition : StubDefinition {
+    override fun configure() {
+        WireMock.stubFor(
+            ...
+        )
+        stubFor(
+            ...
+        )
+    }
+}
+```
+
+### How to use the annotation?
+
+It is possible to declare the annotation in the `class` or in the `method`, each one works differently, as below:
+
+When declared in a `class`, it acts as a `@BeforeAll`, invoking the stub definition class before all test methods,
+removing the identified mappings after all testes finish.
+When declared in a `method`, it acts as a `@BeforeEach`, invoking the stub definition class before each test method
+execution and remove the identified mappings after each execution.
+
+### Known limitations
+
+The annotation, when declared at class level, must be after the `@MicronautTest` annotation. The JUnit invokes the
+extensions using the declared order, so, when the `@StubFor` is declared before the `@MicronautTest`, the Micronaut
+context is not yet initialized, which means, that the WireMock instance is not yet configured.
