@@ -4,7 +4,6 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.Options
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer
 import io.micronaut.context.annotation.Bean
 import io.micronaut.context.annotation.Context
 import io.micronaut.context.annotation.Factory
@@ -24,7 +23,6 @@ internal class WireMockFactory {
         WireMockConfiguration.wireMockConfig()
             .port(configuration.port)
             .bindAddress(configuration.host)
-            .extensions(ResponseTemplateTransformer(true))
 
     @Context
     @Bean(preDestroy = "stop")

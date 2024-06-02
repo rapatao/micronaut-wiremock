@@ -1,24 +1,25 @@
 plugins {
+    id "signing"
+    id 'maven-publish'
+    id "com.github.ben-manes.versions" version "${benManesVersionsVersion}"
+    id "io.github.gradle-nexus.publish-plugin" version "${publishPluginVersion}"
     id "io.gitlab.arturbosch.detekt" version "${detektPluginVersion}"
     id "io.micronaut.minimal.library" version "${micronautPluginVersion}"
-    id "org.jetbrains.dokka" version "${kotlinVersion}"
+    id "org.jetbrains.dokka" version "${dokkaVersion}"
     id "org.jetbrains.kotlin.jvm" version "${kotlinVersion}"
     id "org.jetbrains.kotlin.kapt" version "${kotlinVersion}"
     id "org.jetbrains.kotlin.plugin.allopen" version "${kotlinVersion}"
     id "org.jetbrains.kotlinx.kover" version "${koverPluginVersion}"
-    id "signing"
-    id 'maven-publish'
 }
 
 group = 'com.rapatao.micronaut'
-version = '1.1.1-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 micronaut {
-    version "3.7.1"
+    version "${micronautVersion}"
     testRuntime "junit5"
     processing {
         incremental true
@@ -27,13 +28,14 @@ micronaut {
 }
 
 dependencies {
-    implementation("com.github.tomakehurst:wiremock-jre8:${wiremockVersion}")
+    api("org.wiremock:wiremock:${wiremockVersion}")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 
     compileOnly("org.junit.jupiter:junit-jupiter-api")
 
+    testImplementation("io.micronaut.serde:micronaut-serde-jackson")
     testImplementation("io.micronaut:micronaut-http-client")
 }
 
@@ -50,20 +52,15 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "${javaVersion}"
 }
 
+test {
+    useJUnitPlatform()
+}
+
 kover {
-    xmlReport {
-        onCheck = true
-    }
-
-    htmlReport {
-        onCheck = true
-    }
-
-    verify {
-        rule {
-            name = "Minimal line coverage rate in percents"
-            bound {
-                minValue = 90
+    reports {
+        verify {
+            rule {
+                minBound(90)
             }
         }
     }
@@ -82,8 +79,17 @@ detekt {
 }
 
 signing {
-    sign configurations.archives
+    useGpgCmd()
     sign publishing.publications
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            username = System.getenv('OSSRH_USERNAME')
+            password = System.getenv('OSSRH_PASSWORD')
+        }
+    }
 }
 
 publishing {
@@ -114,21 +120,6 @@ publishing {
                     developerConnection = "scm:git:ssh://github.com/rapatao/micronaut-wiremock.git"
                     url = "https://github.com/rapatao/micronaut-wiremock"
                 }
-            }
-        }
-    }
-    repositories {
-        maven {
-            url = uri("${buildDir}/publishing-repository")
-        }
-        maven {
-            def releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            def snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-
-            credentials {
-                username = ossrhUsername
-                password = ossrhPassword
             }
         }
     }
