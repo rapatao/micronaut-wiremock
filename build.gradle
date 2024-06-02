@@ -28,7 +28,7 @@ micronaut {
 }
 
 dependencies {
-    api("com.github.tomakehurst:wiremock-jre8:${wiremockVersion}")
+    api("org.wiremock:wiremock:${wiremockVersion}")
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
